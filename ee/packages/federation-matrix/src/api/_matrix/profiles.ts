@@ -364,6 +364,16 @@ export const getMatrixProfilesRoutes = () => {
 
 				const response = await federationSDK.queryProfile(userId);
 
+				if (!response) {
+					return {
+						body: {
+							errcode: 'M_NOT_FOUND',
+							error: `User ${userId} not found`,
+						},
+						statusCode: 404,
+					};
+				}
+
 				if (field) {
 					return {
 						body: {
@@ -374,7 +384,10 @@ export const getMatrixProfilesRoutes = () => {
 				}
 
 				return {
-					body: response,
+					body: {
+						displayname: response.displayname,
+						avatar_url: response.avatar_url,
+					},
 					statusCode: 200,
 				};
 			},

@@ -1,4 +1,4 @@
-import { Room } from '@rocket.chat/core-services';
+import { Room, Upload } from '@rocket.chat/core-services';
 import { isBannedSubscription } from '@rocket.chat/core-typings';
 import type { IRoomNativeFederated, IRoom, IUser, RoomType } from '@rocket.chat/core-typings';
 import { federationSDK, type HomeserverEventSignatures, type PduForType } from '@rocket.chat/federation-sdk';
@@ -8,9 +8,70 @@ import debounce from 'lodash.debounce';
 import mem from 'mem';
 
 import { createOrUpdateFederatedUser } from '../helpers/createOrUpdateFederatedUser';
+import { extractDomainFromMatrixUserId } from '../helpers/extractDomainFromMatrixUserId';
 import { getUsernameServername } from '../helpers/getUsernameServername';
+import { MatrixMediaService } from '../services/MatrixMediaService';
 
 const logger = new Logger('federation-matrix:member');
+
+async function downloadAndSetAvatar(user: IUser, avatarUrl: string | null): Promise<void> {
+	try {
+		// if no avatarUrl is provided, it means the user removed his avatar, so we need to set an empty avatar to remove the avatar from their side as well
+		if (!avatarUrl) {
+			await Upload.resetUserAvatar(user);
+			return;
+		}
+
+		if (!avatarUrl?.startsWith('mxc://')) {
+			return;
+		}
+
+		logger.debug(`Downloading avatar for user ${user.username}: ${avatarUrl}`);
+
+		const parsed = MatrixMediaService.parseMXCUri(avatarUrl);
+		if (!parsed) {
+			logger.warn(`Invalid MXC URI: ${avatarUrl}`);
+			return;
+		}
+
+		const buffer = await federationSDK.downloadFromRemoteServer(parsed.serverName, parsed.mediaId);
+		if (!buffer) {
+			logger.warn(`Failed to download avatar from ${avatarUrl}`);
+			return;
+		}
+
+		// detect content type from buffer (basic image type detection)
+		let contentType: string | undefined;
+		if (buffer[0] === 0xff && buffer[1] === 0xd8) {
+			contentType = 'image/jpeg';
+		} else if (buffer[0] === 0x89 && buffer[1] === 0x50 && buffer[2] === 0x4e && buffer[3] === 0x47) {
+			contentType = 'image/png';
+		} else if (buffer[0] === 0x47 && buffer[1] === 0x49 && buffer[2] === 0x46) {
+			contentType = 'image/gif';
+		} else if (
+			buffer[0] === 0x52 &&
+			buffer[1] === 0x49 &&
+			buffer[2] === 0x46 &&
+			buffer[3] === 0x46 &&
+			buffer[8] === 0x57 &&
+			buffer[9] === 0x45 &&
+			buffer[10] === 0x42 &&
+			buffer[11] === 0x50
+		) {
+			contentType = 'image/webp';
+		}
+
+		if (!contentType) {
+			logger.warn({ msg: 'Unsupported remote avatar format from external server', username: user.username, avatarUrl });
+			return;
+		}
+
+		// TODO need to perform a validation to check if the user actually changed avatar
+		await Upload.setUserAvatar(user, buffer, contentType, 'rest');
+	} catch (error) {
+		logger.error({ err: error, user: user.username, msg: `Error downloading/setting avatar for user` });
+	}
+}
 
 async function getOrCreateFederatedUser(userId: string): Promise<IUser> {
 	try {
@@ -204,6 +265,14 @@ function updateUserNameDebounced(userId: string, newName: string): void {
 	void getUpdateUserNameDebounced(userId)(newName);
 }
 
+const getDownloadAndSetAvatarDebounced = mem((_userId: string) =>
+	debounce((user: IUser, avatarUrl: string | null) => downloadAndSetAvatar(user, avatarUrl), 2000),
+);
+
+function downloadAndSetAvatarDebounced(userId: string, user: IUser, newAvatarUrl: string | null): void {
+	void getDownloadAndSetAvatarDebounced(userId)(user, newAvatarUrl);
+}
+
 async function handleJoin({
 	room_id: roomId,
 	state_key: userId,
@@ -222,6 +291,14 @@ async function handleJoin({
 	const subscription = await Subscriptions.findOneByRoomIdAndUserId(room._id, joiningUser._id);
 	if (!subscription) {
 		throw new Error(`Subscription not found while joining user ${userId} to room ${roomId}`);
+	}
+
+	const senderServerName = extractDomainFromMatrixUserId(userId);
+
+	// handle avatar updates to membership events
+	if (senderServerName !== federationSDK.getConfig('serverName')) {
+		// TODO if there is no avatar_url we may want to validate first if we should remove the user avatar because if may be dealing with an old join event, and the user may have changed their avatar since then, so we need to check if the avatar_url is different from the current one before removing it
+		void downloadAndSetAvatarDebounced(joiningUser._id, joiningUser, content.avatar_url || null);
 	}
 
 	// updates user name whenever we receive a join event, because Matrix sends a new join event with the updated display name whenever a user changes their display name

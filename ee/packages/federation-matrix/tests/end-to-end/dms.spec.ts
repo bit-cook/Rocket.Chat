@@ -1015,7 +1015,7 @@ const waitForRoomEvent = async (
 				});
 
 				it('should show the room name as the inviter name on Synapse before join', async () => {
-					expect(hs1Room1.name).toBe(rcUser1.username);
+					expect(hs1Room1.name).toBe(rcUser1.fullName);
 				});
 
 				it('should display the fname containing the two invited users for the inviter', async () => {
@@ -1048,7 +1048,7 @@ const waitForRoomEvent = async (
 				});
 
 				it('should show the room name with all members on Synapse after join', async () => {
-					expect(hs1Room1.name).toBe(`${rcUser1.username} and ${rcUser2.username}`);
+					expect(hs1Room1.name).toBe(`${rcUser1.fullName} and ${rcUser2.username}`);
 				});
 
 				it('should keep the fname to the RC invited user when the Synapse invited user accepts the DM', async () => {
