@@ -1,5 +1,48 @@
 # @rocket.chat/meteor
 
+## 8.4.0-rc.1
+
+### Patch Changes
+
+- Bump @rocket.chat/meteor version.
+
+- <details><summary>Updated dependencies [2632182e429d337325fe3b1e28ea52ab12d99591]:</summary>
+
+  - @rocket.chat/media-signaling@1.0.0-rc.1
+  - @rocket.chat/media-calls@0.4.0-rc.1
+  - @rocket.chat/core-services@0.14.0-rc.1
+  - @rocket.chat/ui-voip@20.0.0-rc.1
+  - @rocket.chat/abac@0.2.0-rc.1
+  - @rocket.chat/federation-matrix@0.1.3-rc.1
+  - @rocket.chat/network-broker@0.2.35-rc.1
+  - @rocket.chat/omni-core-ee@0.0.21-rc.1
+  - @rocket.chat/omnichannel-services@0.3.53-rc.1
+  - @rocket.chat/presence@0.2.56-rc.1
+  - @rocket.chat/ui-contexts@30.0.0-rc.1
+  - @rocket.chat/fuselage-ui-kit@30.0.0-rc.1
+  - @rocket.chat/gazzodown@30.0.0-rc.1
+  - @rocket.chat/ui-avatar@26.0.0-rc.1
+  - @rocket.chat/ui-client@30.0.0-rc.1
+  - @rocket.chat/ui-video-conf@30.0.0-rc.1
+  - @rocket.chat/web-ui-registration@30.0.0-rc.1
+  - @rocket.chat/ui-composer@1.0.0-rc.1
+  - @rocket.chat/core-typings@8.4.0-rc.1
+  - @rocket.chat/rest-typings@8.4.0-rc.1
+  - @rocket.chat/license@1.1.16-rc.1
+  - @rocket.chat/pdf-worker@0.3.35-rc.1
+  - @rocket.chat/api-client@0.2.56-rc.1
+  - @rocket.chat/apps@0.6.9-rc.1
+  - @rocket.chat/cron@0.1.56-rc.1
+  - @rocket.chat/http-router@7.9.23-rc.1
+  - @rocket.chat/message-types@0.1.1
+  - @rocket.chat/model-typings@2.2.0-rc.1
+  - @rocket.chat/models@2.2.0-rc.1
+  - @rocket.chat/server-cloud-communication@0.0.3
+  - @rocket.chat/instance-status@0.1.56-rc.1
+  - @rocket.chat/omni-core@0.1.0-rc.1
+  - @rocket.chat/server-fetch@0.2.0-rc.1
+  </details>
+
 ## 8.3.2
 
 ### Patch Changes

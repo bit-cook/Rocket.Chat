@@ -1,5 +1,11 @@
 # @rocket.chat/media-signaling
 
+## 1.0.0-rc.1
+
+### Major Changes
+
+- ([#37161](https://github.com/RocketChat/Rocket.Chat/pull/37161)) Publishes the media signaling package to npm
+
 ## 0.3.0-rc.0
 
 ### Minor Changes

@@ -1,5 +1,18 @@
 # @rocket.chat/core-services
 
+## 0.14.0-rc.1
+
+### Patch Changes
+
+- <details><summary>Updated dependencies [2632182e429d337325fe3b1e28ea52ab12d99591]:</summary>
+
+  - @rocket.chat/media-signaling@1.0.0-rc.1
+  - @rocket.chat/core-typings@8.4.0-rc.1
+  - @rocket.chat/rest-typings@8.4.0-rc.1
+  - @rocket.chat/http-router@7.9.23-rc.1
+  - @rocket.chat/models@2.2.0-rc.1
+  </details>
+
 ## 0.13.4
 
 ### Patch Changes

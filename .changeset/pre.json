@@ -79,9 +79,11 @@
   "changesets": [
     "add-parser-fuzz-testing",
     "block-splitter-layer1",
+    "bump-patch-1776981008743",
     "cool-cups-tickle",
     "cool-parents-buy",
     "eighty-experts-sort",
+    "empty-rockets-rush",
     "empty-spiders-vanish",
     "fair-lions-smell",
     "famous-socks-clap",
