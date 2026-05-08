@@ -59,14 +59,13 @@ exports[`RoomFormAttributeField renders Default without crashing 1`] = `
               <div
                 class="rcx-box rcx-box--full rcx-css-w398ts"
               >
-                <button
+                <input
                   aria-expanded="false"
                   aria-haspopup="listbox"
-                  class="rcx-box rcx-box--full rcx-input-box--undecorated rcx-select__focus rcx-css-trljwa rcx-css-3fq6z9"
-                  type="button"
-                >
-                  ABAC_Select_Attribute_Values
-                </button>
+                  class="rcx-box rcx-box--full rcx-box--animated rcx-input-box--undecorated rcx-input-box rcx-css-trljwa rcx-css-pqpp8q"
+                  placeholder="ABAC_Select_Attribute_Values"
+                  value=""
+                />
               </div>
             </div>
             <div
