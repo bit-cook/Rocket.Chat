@@ -12,6 +12,7 @@ import type { VirtualizerHandle } from 'virtua';
 import { VList } from 'virtua';
 
 import { ThreadMessageItem } from './ThreadMessageItem';
+import { setMessageJumpQueryStringParameter } from '../../../../../lib/utils/setMessageJumpQueryStringParameter';
 import { BubbleDate } from '../../../BubbleDate';
 import { useKeepMountedMessages } from '../../../MessageList/hooks/useKeepMountedMessages';
 import { isMessageNewDay } from '../../../MessageList/lib/isMessageNewDay';
@@ -73,6 +74,7 @@ const ThreadMessageList = ({ mainMessage, shouldJumpToBottom, setShouldJumpToBot
 
 	const virtualizerRef = useRef<VirtualizerHandle | null>(null);
 	const isAtBottom = useRef(true);
+	const lastScrollSizeRef = useRef(0);
 
 	const items = loading ? [] : [mainMessage, ...messages];
 
@@ -102,6 +104,10 @@ const ThreadMessageList = ({ mainMessage, shouldJumpToBottom, setShouldJumpToBot
 			setShouldJumpToBottom(false);
 			return;
 		}
+		if (isAtBottom.current && lastScrollSizeRef.current !== handle?.scrollSize) {
+			lastScrollSizeRef.current = handle?.scrollSize ?? 0;
+			setShouldJumpToBottom(true);
+		}
 		if (shouldJumpToBottom) {
 			handle.scrollToIndex(items.length, { align: 'end' });
 			setShouldJumpToBottom(false);
@@ -124,6 +130,7 @@ const ThreadMessageList = ({ mainMessage, shouldJumpToBottom, setShouldJumpToBot
 		setShouldJumpToBottom(false);
 		handle.scrollToIndex(threadMsgTargetIndex, { align: 'center' });
 		setHighlightMessage(msgJumpParam);
+		setMessageJumpQueryStringParameter(null);
 		setTimeout(() => {
 			clearHighlightMessage();
 		}, 2000);
