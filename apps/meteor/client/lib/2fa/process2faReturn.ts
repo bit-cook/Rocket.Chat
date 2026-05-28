@@ -124,10 +124,12 @@ export const invokeTwoFactorModal = async (
 	props: {
 		method: 'totp' | 'email' | 'password';
 		emailOrUsername?: string | undefined;
+		invalidAttempt?: boolean;
 	},
 	validateCode?: (code: string, method: string) => Promise<void>,
 ) => {
-	assertModalProps(props);
+	const { invalidAttempt, ...restProps } = props;
+	assertModalProps(restProps);
 
 	return new Promise<string>((resolve, reject) => {
 		let isResolved = false;
@@ -136,7 +138,7 @@ export const invokeTwoFactorModal = async (
 		imperativeModal.open({
 			component: TwoFactorModal,
 			props: {
-				...props,
+				...restProps,
 				onConfirm: async (code: string, method: string): Promise<void> => {
 					const actualCode = method === 'password' ? SHA256(code) : code;
 					if (validateCode) {
@@ -162,6 +164,7 @@ export const invokeTwoFactorModal = async (
 						reject(new Error('totp-canceled'));
 					}
 				},
+				...(invalidAttempt && { invalidAttempt }),
 			},
 		});
 	});
