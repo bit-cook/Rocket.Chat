@@ -45,6 +45,7 @@ type MessageListProps = {
 	handleDateScroll: (topMessage: IMessage | undefined, offset: number) => void;
 	setShouldJumpToBottom: Dispatch<SetStateAction<boolean>>;
 	debouncedMessageRead: () => void;
+	setKeepAtBottom: (keepAtBottom: () => void) => void;
 };
 
 export const MessageList = function MessageList({
@@ -66,6 +67,7 @@ export const MessageList = function MessageList({
 	debouncedClearNewMessagesOnScroll,
 	handleDateScroll,
 	debouncedMessageRead,
+	setKeepAtBottom,
 }: MessageListProps) {
 	// Prepend ref needed for adjusting the message list shift
 	// https://inokawa.github.io/virtua/?path=/story/advanced-chat--default
@@ -78,6 +80,18 @@ export const MessageList = function MessageList({
 	const lastScrollSizeRef = useRef(0);
 
 	const messages = useMessages({ rid });
+
+	const messagesLength = canPreview ? messages.length + 1 : messages.length;
+
+	useEffect(() => {
+		setKeepAtBottom(() => {
+			if (virtualizerRef.current) {
+				virtualizerRef.current.scrollToIndex(messagesLength, {
+					align: 'end',
+				});
+			}
+		});
+	}, [messagesLength, setKeepAtBottom]);
 
 	const keepMountedMessages = useKeepMountedMessages(messages, canPreview);
 
@@ -98,6 +112,11 @@ export const MessageList = function MessageList({
 			const scrollSize = virtualizerRef.current?.scrollSize ?? 0;
 			const viewportSize = virtualizerRef.current?.viewportSize ?? 0;
 
+			if (hasMoreNextMessages) {
+				isAtBottom.current = false;
+				return;
+			}
+
 			if (scrollSize >= viewportSize) {
 				isAtBottom.current = true;
 			}
@@ -107,7 +126,7 @@ export const MessageList = function MessageList({
 				setShouldJumpToBottom(false);
 			}
 		},
-		[isAtBottom, setShouldJumpToBottom, shouldJumpToBottom],
+		[isAtBottom, setShouldJumpToBottom, shouldJumpToBottom, hasMoreNextMessages],
 	);
 
 	const isRoomInitialized = useRef<boolean>(false);
